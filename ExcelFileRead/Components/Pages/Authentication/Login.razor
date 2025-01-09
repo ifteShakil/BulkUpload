@@ -1,0 +1,103 @@
+﻿@page "/"
+
+@using BulkUpload.Components.Layout
+@using System.ComponentModel.DataAnnotations
+@using BulkUpload.DataModel.Authentication
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+@layout LoginLayout
+
+@inject UserAccountService userAccountService
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager Navigation
+
+@inject NotificationService NotificationService
+
+<div style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #e8eeff;">
+
+    <RadzenCard class="rz-my-12 rz-mx-auto rz-p-4 rz-p-md-12" style="max-width: 600px;">
+        @* <RadzenTemplateForm Data=@("LoginWithDefaultValues")>
+            <RadzenLogin AllowRegister="false" AllowResetPassword="false" AllowRememberMe="true" 
+                         @bind-Username="model.LoginName"
+                         @bind-Password="model.Password"
+                         Login=@(args => OnLogin()) />
+        </RadzenTemplateForm> *@
+
+        <RadzenTemplateForm Data=@("LoginWithDefaultValues")>
+            <RadzenLogin AllowRegister="false" AllowResetPassword="false" Username=@userName Password=@password
+                         AllowRememberMe="true" RememberMe="@rememberMe"
+                         Login=@(args => OnLogin(args, "Login with default values")) />
+        </RadzenTemplateForm>
+
+    </RadzenCard>
+
+</div>
+
+
+
+
+@code {
+
+    private bool isProcessing;
+
+    string userName = "";
+    string password = "";
+    bool rememberMe = true;
+
+    private LoginModel model = new LoginModel();
+
+    private async Task OnLogin(LoginArgs args, string name)
+    {
+        isProcessing = true;
+
+        try
+        {
+            // User Authentication Logic
+            var userAccount = userAccountService.GetByUserName(args.Username, args.Password);
+            if (userAccount == null)
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Error", "Invalid login name or password.");
+                return;
+            }
+            else
+            {
+
+                // Update Authentication State
+                var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+                await customAuthStateProvider.UpdateAuthenticationState(new UserSession
+                    {
+                        LoginName = userAccount.LoginName,
+                        RoleName = userAccount.RoleName
+                    });
+
+                // Navigate to Dashboard
+                Navigation.NavigateTo("/Dashboard", true);
+
+            }
+
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", ex.Message);
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+
+    private class LoginModel
+    {
+        [Required(ErrorMessage = "Login Name is required")]
+        public string LoginName { get; set; }
+
+        [Required(ErrorMessage = "Password is required")]
+        public string Password { get; set; }
+
+
+    }
+    
+
+
+}
+

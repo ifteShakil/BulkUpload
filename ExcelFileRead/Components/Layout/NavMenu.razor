@@ -1,0 +1,65 @@
+﻿
+@* 
+<RadzenStack AlignItems="AlignItems.Center" class="rz-p-12 navbar navbar-dark">
+      
+    <div class="nav-item px-12 form-control-color">
+        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+        </NavLink>
+    </div>
+
+    <div class="nav-item px-12">
+        <NavLink class="nav-link" href="inv-stock-receive-list">
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Stock Receive
+        </NavLink>
+    </div>
+
+    <div class="nav-item px-12">
+        <NavLink class="nav-link" href="inv-stock-sales-list">
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Stock Sales
+        </NavLink>
+    </div>
+
+    <div class="nav-item px-12">
+        <NavLink class="nav-link" href="inv-stock-sales-upload">
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Upload Stock Sales
+        </NavLink>
+    </div>      
+
+</RadzenStack>
+ *@
+
+
+
+
+@* <div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">ISPAHANI TEA LIMITED</a>
+    </div>
+</div> *@
+
+@* <input type="checkbox" title="Navigation menu" class="navbar-toggler" /> *@
+
+<div class="nav-scrollable navbar navbar-dark" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="inv-stock-receive-list">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Stock Receive
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="inv-stock-sales-list">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Stock Sales
+            </NavLink>
+        </div>
+       
+    </nav>
+</div>
+

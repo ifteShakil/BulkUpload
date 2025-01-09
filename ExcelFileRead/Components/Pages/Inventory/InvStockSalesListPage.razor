@@ -1,0 +1,71 @@
+﻿@page "/inv-stock-sales-list"
+@using BulkUpload.DataModel.Inventory
+@using BulkUpload.Repository.Interface
+@using Microsoft.EntityFrameworkCore
+
+@inject IStockSalesTempService StockSalesTempService
+
+<h3>Stock Sales </h3>
+
+<div class="container mt-3">
+    <div class="row mb-3">
+
+        <div class="col-md-12 text-end">
+
+            <a class="btn btn-success" href="inv-stock-sales-upload">Upload Stock Sales Data</a>
+        </div>
+
+    </div>
+    @if (salesData == null)
+    {
+        <div class="alert alert-info">Loading data...</div>
+    }
+    else if (!salesData.Any())
+    {
+        <div class="alert alert-warning">No data found.</div>
+    }
+    else
+    {
+
+        <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false"
+                        FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="8" AllowPaging="true"
+                        PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                        Data="@salesData" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or"
+                        SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedSalesData>
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(InvStockSalesTemp.SalesTempId)" Filterable="false" Title="ID" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Property="@nameof(InvStockSalesTemp.Invoice)" Title="Invoice" Width="160px" />
+                <RadzenDataGridColumn Property="@nameof(InvStockSalesTemp.Date)" Title="Date" FormatString="{0:d}" Width="160px" />
+                <RadzenDataGridColumn Property="@nameof(InvStockSalesTemp.CustomerID)" Title="Customer ID" Width="160px" />
+                <RadzenDataGridColumn Property="@nameof(InvStockSalesTemp.ItemId)" Title="Item ID" Width="160px" />
+                <RadzenDataGridColumn Property="@nameof(InvStockSalesTemp.Qty)" Title="Quantity" Width="160px" />
+                <RadzenDataGridColumn Property="@nameof(InvStockSalesTemp.Price)" Title="Price" Width="160px" />
+                <RadzenDataGridColumn Property="@nameof(InvStockSalesTemp.NetTotal)" Title="Net Total" Width="160px" />
+                <RadzenDataGridColumn Property="@nameof(InvStockSalesTemp.Remarks)" Title="Remarks" Width="200px" />
+            </Columns>
+        </RadzenDataGrid>
+
+
+    }
+    
+ </div>
+
+
+
+
+@code {
+    
+
+    IQueryable<InvStockSalesTemp> salesData;
+    IList<InvStockSalesTemp> selectedSalesData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        salesData = StockSalesTempService.GetAll();
+
+        selectedSalesData = new List<InvStockSalesTemp>() {
+            salesData.FirstOrDefault()
+        }; 
+    }
+}

@@ -1,0 +1,439 @@
+﻿@page "/inv-stock-receive-upload"
+
+
+@using BulkUpload.DataModel.Inventory
+@using BulkUpload.Repository.Interface
+@using OfficeOpenXml
+@inject IJSRuntime JS
+@inject IStockReceiveService StockReceiveService
+
+<PageTitle>Read and Send bulk Data to Database</PageTitle>
+
+<h3>Upload data</h3>
+
+<InputFile OnChange="ReadExcelFile" accept=".xlsx" />
+
+@if (excelData != null)
+{
+    <button class="btn btn-success mt-3" @onclick="SaveFileAndData">Save Data and File</button>
+    <br />
+    <br />
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                @foreach (var header in excelData[0])
+                {
+                    <th>@header</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in excelData.Skip(1))
+            {
+                <tr>
+                    @foreach (var cell in row)
+                    {
+                        <td>@cell</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+
+
+
+@code {
+    private IBrowserFile? file;
+    private List<List<string>>? excelData;
+
+    private async Task ReadExcelFile(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            file = e.File;
+
+            if (file != null)
+            {
+                using var memoryStream = new MemoryStream();
+                await file.OpenReadStream().CopyToAsync(memoryStream);
+                memoryStream.Position = 0;
+
+
+
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                using var package = new ExcelPackage(memoryStream);
+
+                var worksheet = package.Workbook.Worksheets[0];
+                var rowCount = worksheet.Dimension.Rows;
+                var colCount = worksheet.Dimension.Columns;
+
+                excelData = new List<List<string>>();
+                for (int row = 1; row <= rowCount; row++)
+                {
+                    var rowData = new List<string>();
+                    for (int col = 1; col <= colCount; col++)
+                    {
+                        rowData.Add(worksheet.Cells[row, col].Text);
+                    }
+                    excelData.Add(rowData);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Error reading file: {ex.Message}");
+        }
+    }
+
+    private async Task SaveFileAndData()
+    {
+        try
+        {
+            if (file == null || excelData == null)
+            {
+                await JS.InvokeVoidAsync("alert", "Please upload a file before saving.");
+                return;
+            }
+
+            // 1. Save the file to the project folder
+            var currentDate = DateTime.Now.ToString("yyyyMMdd");
+            var uniqueFileName = $"{currentDate}_{Guid.NewGuid()}_{file.Name}";
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "StockReciveFiles");
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await file.OpenReadStream().CopyToAsync(stream);
+
+            Console.WriteLine($"File saved successfully at: {filePath}");
+
+            // 2. Save the data to the database
+            for (int i = 1; i < excelData.Count; i++)
+            {
+                var row = excelData[i];
+
+                var stockReceive = new InvStockReceiveTemp
+                    {
+                        ChallanNo = row[0],
+
+                        BOMNo = row[1],
+
+                        ChallanDate = DateTime.TryParse(row[2], out var challanDate) ? challanDate : (DateTime?)null,
+
+                        ChallanRef = row[3],
+                        PortId = int.TryParse(row[4], out var portId) ? portId : (int?)null,
+
+                        PoType = row[5],
+
+                        PoRefNo = row[6],
+
+                        JobNo = row[7],
+
+                        ProductGroup = int.TryParse(row[8], out var productGroup) ? productGroup : (int?)null,
+
+                        ProductId = int.TryParse(row[9], out var productId) ? productId : (int?)null,
+
+                        UnitId = int.TryParse(row[10], out var unitId) ? unitId : (int?)null,
+
+                        Qty = float.TryParse(row[11], out var qty) ? qty : 0,
+
+                        Currency = row[12],
+
+                        Rate = float.TryParse(row[13], out var rate) ? rate : 0,
+
+                        Total = float.TryParse(row[14], out var total) ? total : 0,
+
+                        ConvRate = float.TryParse(row[15], out var convRate) ? convRate : 0,
+
+                        TotalConvAmount = float.TryParse(row[16], out var totalConvAmount) ? totalConvAmount : 0,
+
+                        CDPer = float.TryParse(row[17], out var CDPer) ? CDPer : 0,
+
+                        CDValue = float.TryParse(row[18], out var CDValue) ? CDValue : 0,
+
+                        RDPer = float.TryParse(row[19], out var RDPer) ? RDPer : 0,
+
+                        RDValue = float.TryParse(row[20], out var RDValue) ? RDValue : 0,
+
+                        AITPer = float.TryParse(row[21], out var AITPer) ? AITPer : 0,
+
+                        AITValue = float.TryParse(row[22], out var AITValue) ? AITValue : 0,
+
+                        ATPer = float.TryParse(row[23], out var ATPer) ? ATPer : 0,
+
+                        ATValue = float.TryParse(row[24], out var ATValue) ? ATValue : 0,
+
+                        SD_Rate = float.TryParse(row[25], out var SD_Rate) ? SD_Rate : 0,
+
+                        SD = float.TryParse(row[26], out var SD) ? SD : 0,
+
+                        VAT_Rate = float.TryParse(row[27], out var VAT_Rate) ? VAT_Rate : 0,
+
+                        VAT = float.TryParse(row[28], out var VAT) ? VAT : 0,
+
+                        RebatePer = float.TryParse(row[29], out var RebatePer) ? RebatePer : 0,
+
+                        Rebate = float.TryParse(row[30], out var Rebate) ? Rebate : 0,
+
+                        TotalPriceIncVAT = float.TryParse(row[31], out var TotalPriceIncVAT) ? TotalPriceIncVAT : 0,
+
+                        StockOpiningBalance = float.TryParse(row[32], out var StockOpiningBalance) ? StockOpiningBalance : 0,
+
+                        StockOpiningBalValue = float.TryParse(row[33], out var StockOpiningBalValue) ? StockOpiningBalValue : 0,
+
+                        StockClosinigBalance = float.TryParse(row[34], out var StockClosinigBalance) ? StockClosinigBalance : 0,
+
+                        StockClosinigBalValue = float.TryParse(row[35], out var StockClosinigBalValue) ? StockClosinigBalValue : 0,
+
+                        Barcode = row[36],
+
+                        SupplierId = int.TryParse(row[37], out var supplierId) ? supplierId : (int?)null,
+
+                        SupplierLedgerCode = row[38],
+
+                        PurchaseLedgerCode = row[39],
+
+                        StoreId = int.TryParse(row[40], out var StoreId) ? StoreId : (int?)null,
+
+                        VDS_Applicable = bool.TryParse(row[41], out var vdsApplicable) && vdsApplicable,
+
+                        VAT_AccountCode = row[42],
+
+                        Create_User = Guid.TryParse(row[43], out var createUser) ? createUser : (Guid?)null,
+
+                        Create_Date = DateTime.TryParse(row[44], out var createDate) ? createDate : (DateTime?)null,
+
+                        Edit_User = Guid.TryParse(row[45], out var editUser) ? editUser : (Guid?)null,
+
+                        Edit_Date = DateTime.TryParse(row[46], out var editDate) ? editDate : (DateTime?)null,
+
+                        OCode = row[47],
+
+                        BatchNo = row[48],
+
+                        HSCODE = row[49],
+
+                        BillofEntryDate = DateTime.TryParse(row[50], out var billOfEntryDate) ? billOfEntryDate : (DateTime?)null,
+
+                        VATStatus = bool.TryParse(row[51], out var vatStatus) && vatStatus,
+
+                        Remarks = row[52],
+
+                        ActualQty = float.TryParse(row[53], out var actualQty) ? actualQty : 0,
+
+                        FreeQty = float.TryParse(row[54], out var freeQty) ? freeQty : 0,
+
+                        ATVPer = float.TryParse(row[55], out var atvPer) ? atvPer : 0,
+
+                        ATVValue = float.TryParse(row[56], out var atvValue) ? atvValue : 0,
+
+                        BankId = int.TryParse(row[57], out var bankId) ? bankId : (int?)null,
+
+                        PurchaseType = row[58],
+
+                        BankAccountsId = int.TryParse(row[59], out var bankAccountsId) ? bankAccountsId : (int?)null
+
+                    };
+
+                await StockReceiveService.AddAsync(stockReceive);
+            }
+
+            await JS.InvokeVoidAsync("alert", "File and data saved successfully.");
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Error saving data: {ex.Message}");
+        }
+    }
+
+
+
+    // save excel file
+    // public async Task SaveExcelFileToProjectFolder(InputFileChangeEventArgs e)
+    // {
+    //     var file = e.File; 
+
+    //     if (file != null)
+    //     {
+    //         // create file name
+    //         var uniqueFileName = $"{Guid.NewGuid()}_{file.Name}";
+    //         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "StockReciveFiles");
+
+    //         if (!Directory.Exists(uploadsFolder))
+    //         {
+    //             Directory.CreateDirectory(uploadsFolder);
+    //         }
+
+    //         // create full path
+    //         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+    //         // file copy to folder
+    //         using var stream = new FileStream(filePath, FileMode.Create);
+    //         await file.OpenReadStream().CopyToAsync(stream);
+
+            
+    //         Console.WriteLine($"File saved successfully at: {filePath}");
+    //     }
+    // }
+
+
+    // private async Task SaveDataToDatabase()
+    // {
+    //     try
+    //     {
+    //         if (excelData != null)
+    //         {
+    //             // Assuming the first row contains headers and the rest are data rows.
+    //             for (int i = 1; i < excelData.Count; i++)
+    //             {
+    //                 var row = excelData[i];
+
+    //                 var stockReceive = new InvStockReceiveTemp
+    //                     {
+    //                         ChallanNo = row[0],
+                            
+    //                         BOMNo = row[1], 
+
+    //                         ChallanDate = DateTime.TryParse(row[2], out var challanDate) ? challanDate : (DateTime?)null,
+                            
+    //                         ChallanRef = row[3], 
+    //                         PortId = int.TryParse(row[4], out var portId) ? portId : (int?)null, 
+
+    //                         PoType = row[5], 
+
+    //                         PoRefNo = row[6], 
+
+    //                         JobNo = row[7], 
+
+    //                         ProductGroup = int.TryParse(row[8], out var productGroup) ? productGroup : (int?)null, 
+
+    //                         ProductId = int.TryParse(row[9], out var productId) ? productId : (int?)null, 
+
+    //                         UnitId = int.TryParse(row[10], out var unitId) ? unitId : (int?)null, 
+
+    //                         Qty = float.TryParse(row[11], out var qty) ? qty : 0, 
+
+    //                         Currency = row[12], 
+
+    //                         Rate = float.TryParse(row[13], out var rate) ? rate : 0, 
+
+    //                         Total = float.TryParse(row[14], out var total) ? total : 0, 
+
+    //                         ConvRate = float.TryParse(row[15], out var convRate) ? convRate : 0, 
+
+    //                         TotalConvAmount = float.TryParse(row[16], out var totalConvAmount) ? totalConvAmount : 0, 
+
+    //                         CDPer = float.TryParse(row[17], out var CDPer) ? CDPer : 0,
+
+    //                         CDValue = float.TryParse(row[18], out var CDValue) ? CDValue : 0,
+
+    //                         RDPer = float.TryParse(row[19], out var RDPer) ? RDPer : 0,
+
+    //                         RDValue = float.TryParse(row[20], out var RDValue) ? RDValue : 0,
+
+    //                         AITPer = float.TryParse(row[21], out var AITPer) ? AITPer : 0,
+
+    //                         AITValue = float.TryParse(row[22], out var AITValue) ? AITValue : 0,
+
+    //                         ATPer = float.TryParse(row[23], out var ATPer) ? ATPer : 0,
+
+    //                         ATValue = float.TryParse(row[24], out var ATValue) ? ATValue : 0,
+
+    //                         SD_Rate = float.TryParse(row[25], out var SD_Rate) ? SD_Rate : 0,
+
+    //                         SD = float.TryParse(row[26], out var SD) ? SD : 0,
+
+    //                         VAT_Rate = float.TryParse(row[27], out var VAT_Rate) ? VAT_Rate : 0,
+
+    //                         VAT = float.TryParse(row[28], out var VAT) ? VAT : 0,
+
+    //                         RebatePer = float.TryParse(row[29], out var RebatePer) ? RebatePer : 0,
+
+    //                         Rebate = float.TryParse(row[30], out var Rebate) ? Rebate : 0,
+
+    //                         TotalPriceIncVAT = float.TryParse(row[31], out var TotalPriceIncVAT) ? TotalPriceIncVAT : 0,
+
+    //                         StockOpiningBalance = float.TryParse(row[32], out var StockOpiningBalance) ? StockOpiningBalance : 0,
+
+    //                         StockOpiningBalValue = float.TryParse(row[33], out var StockOpiningBalValue) ? StockOpiningBalValue : 0,
+
+    //                         StockClosinigBalance = float.TryParse(row[34], out var StockClosinigBalance) ? StockClosinigBalance : 0,
+
+    //                         StockClosinigBalValue = float.TryParse(row[35], out var StockClosinigBalValue) ? StockClosinigBalValue : 0,
+
+    //                         Barcode = row[36],
+
+    //                         SupplierId = int.TryParse(row[37], out var supplierId) ? supplierId : (int?)null,
+
+    //                         SupplierLedgerCode = row[38],
+
+    //                         PurchaseLedgerCode = row[39],
+
+    //                         StoreId = int.TryParse(row[40], out var StoreId) ? StoreId : (int?)null,
+
+    //                         VDS_Applicable = bool.TryParse(row[41], out var vdsApplicable) && vdsApplicable,
+
+    //                         VAT_AccountCode = row[42],
+
+    //                         Create_User = Guid.TryParse(row[43], out var createUser) ? createUser : (Guid?)null,
+
+    //                         Create_Date = DateTime.TryParse(row[44], out var createDate) ? createDate : (DateTime?)null,
+
+    //                         Edit_User = Guid.TryParse(row[45], out var editUser) ? editUser : (Guid?)null,
+
+    //                         Edit_Date = DateTime.TryParse(row[46], out var editDate) ? editDate : (DateTime?)null,
+
+    //                         OCode = row[47],
+
+    //                         BatchNo = row[48],
+
+    //                         HSCODE = row[49],
+
+    //                         BillofEntryDate = DateTime.TryParse(row[50], out var billOfEntryDate) ? billOfEntryDate : (DateTime?)null,
+
+    //                         VATStatus = bool.TryParse(row[51], out var vatStatus) && vatStatus,
+
+    //                         Remarks = row[52],
+
+    //                         ActualQty = float.TryParse(row[53], out var actualQty) ? actualQty : 0,
+
+    //                         FreeQty = float.TryParse(row[54], out var freeQty) ? freeQty : 0,
+
+    //                         ATVPer = float.TryParse(row[55], out var atvPer) ? atvPer : 0,
+
+    //                         ATVValue = float.TryParse(row[56], out var atvValue) ? atvValue : 0,
+
+    //                         BankId = int.TryParse(row[57], out var bankId) ? bankId : (int?)null,
+
+    //                         PurchaseType = row[58],
+
+    //                         BankAccountsId = int.TryParse(row[59], out var bankAccountsId) ? bankAccountsId : (int?)null
+
+
+    //                     };
+
+    //                 // Add the data to the database using the service.
+    //                 await StockReceiveService.AddAsync(stockReceive);
+    //             }
+
+    //             await JS.InvokeVoidAsync("alert", "Data saved successfully.");
+    //         }
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         await JS.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+    //     }
+    // }
+
+
+}
+
+

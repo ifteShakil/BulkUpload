@@ -1,0 +1,277 @@
+﻿@page "/inv-stock-sales-upload"
+
+@using BulkUpload.DataModel.Inventory
+@using BulkUpload.Repository.Interface
+@using OfficeOpenXml
+@inject IJSRuntime JS
+@inject IStockSalesTempService StockSalesTempService
+
+<PageTitle>Read and Send Sales Data to Database</PageTitle>
+
+<h3>Upload Sales Data</h3>
+
+
+
+<InputFile OnChange="ReadExcelFile" accept=".xlsx" />
+
+@if (excelData != null)
+{
+    <button class="btn btn-success mt-3" @onclick="SaveFileAndData">Save Data to Database</button>
+    <br />
+    <br />
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                @foreach (var header in excelData[0])
+                {
+                    <th>@header</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in excelData.Skip(1))
+            {
+                <tr>
+                    @foreach (var cell in row)
+                    {
+                        <td>@cell</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+
+@code {
+    private IBrowserFile? file;
+    private List<List<string>>? excelData;
+
+    private async Task ReadExcelFile(InputFileChangeEventArgs e)
+    {
+        try
+        {
+                file = e.File;
+            if (file != null)
+            {
+                using var memoryStream = new MemoryStream();
+                await file.OpenReadStream().CopyToAsync(memoryStream);
+                memoryStream.Position = 0;
+
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                using var package = new ExcelPackage(memoryStream);
+
+                var worksheet = package.Workbook.Worksheets[0];
+                var rowCount = worksheet.Dimension.Rows;
+                var colCount = worksheet.Dimension.Columns;
+
+                excelData = new List<List<string>>();
+                for (int row = 1; row <= rowCount; row++)
+                {
+                    var rowData = new List<string>();
+                    for (int col = 1; col <= colCount; col++)
+                    {
+                        rowData.Add(worksheet.Cells[row, col].Text);
+                    }
+                    excelData.Add(rowData);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+
+
+    private async Task SaveFileAndData()
+    {
+        try
+        {
+            if (file == null || excelData == null)
+            {
+                await JS.InvokeVoidAsync("alert", "Please upload a file before saving.");
+                return;
+            }
+
+            // 1. Save the file to the project folder
+            var currentDate = DateTime.Now.ToString("yyyyMMdd");
+            var uniqueFileName = $"{currentDate}_{Guid.NewGuid()}_{file.Name}";
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "StockSalesFiles");
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await file.OpenReadStream().CopyToAsync(stream);
+
+            Console.WriteLine($"File saved successfully at: {filePath}");
+
+            // 2. Save the data to the database
+            for (int i = 1; i < excelData.Count; i++)
+            {
+                var row = excelData[i];
+
+                var stockSales = new InvStockSalesTemp
+                    {
+                        Invoice = row[0],
+
+                        Date = DateTime.TryParse(row[1], out var date) && date >= new DateTime(1753, 1, 1) ? date : new DateTime(1753, 1, 1),
+
+                        BINNo = row[2],
+
+                        CustomerID = long.TryParse(row[3], out var customerId) ? customerId : (long?)null,
+
+                        LadgerCode = row[4],
+
+                        StoreId = int.TryParse(row[5], out var storeId) ? storeId : (int?)null,
+
+                        ItemId = long.TryParse(row[6], out var itemId) ? itemId : 0,
+
+                        Qty = double.TryParse(row[7], out var qty) ? qty : 0,
+
+                        Price = decimal.TryParse(row[8], out var price) ? price : 0,
+
+                        Total = decimal.TryParse(row[9], out var total) ? total : 0,
+
+                        ItemDiscountAmt = decimal.TryParse(row[10], out var itemDiscountAmt) ? itemDiscountAmt : 0,
+
+                        SDPercentage = decimal.TryParse(row[11], out var sdPercentage) ? sdPercentage : 0,
+
+                        SDAmount = decimal.TryParse(row[12], out var sdAmount) ? sdAmount : 0,
+
+                        ItemVatPer = decimal.TryParse(row[13], out var itemVatPer) ? itemVatPer : 0,
+
+                        FixedVATRate = decimal.TryParse(row[14], out var fixedVatRate) ? fixedVatRate : 0,
+
+                        ItemVat = decimal.TryParse(row[15], out var itemVat) ? itemVat : 0,
+
+                        NetTotal = decimal.TryParse(row[16], out var netTotal) ? netTotal : 0,
+
+                        InvoiceAmount = decimal.TryParse(row[17], out var invoiceAmount) ? invoiceAmount : 0,
+
+                        SalesType = row[18],
+
+                        NatureOfSupply = row[19],
+
+                        DeliveryPoint_Id = long.TryParse(row[20], out var deliveryPointId) ? deliveryPointId : (long?)null, 
+
+                        Remarks = row[21], 
+
+                        OCODE = row[22], 
+
+                        Create_User = Guid.TryParse(row[23], out var createUser) ? createUser : (Guid?)null, 
+                        Create_Date = DateTime.TryParse(row[24], out var createDate) ? createDate : (DateTime?)null, 
+                        Edit_User = Guid.TryParse(row[25], out var editUser) ? editUser : (Guid?)null, 
+                        Edit_Date = DateTime.TryParse(row[26], out var editDate) ? editDate : (DateTime?)null, 
+                        VehicleType_Id = int.TryParse(row[27], out var vehicleTypeId) ? vehicleTypeId : (int?)null, 
+                        VehicleNo = row[28], 
+                        DiscountPercent = double.TryParse(row[29], out var discountPercent) ? discountPercent : 0, 
+                        ItemRateDiscPercent = double.TryParse(row[30], out var itemRateDiscPercent) ? itemRateDiscPercent : 0, 
+                        PO_RefNo = row[31] 
+                    };
+
+                // Add the data to the database using the service.
+                await StockSalesTempService.AddAsync(stockSales);
+            }
+
+            await JS.InvokeVoidAsync("alert", "File and data saved successfully.");
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Error saving data: {ex.Message}");
+        }
+    }
+
+
+    // private async Task SaveDataToDatabase()
+    // {
+    //     try
+    //     {
+    //         if (excelData != null)
+    //         {
+    //             // Assuming the first row contains headers and the rest are data rows.
+    //             for (int i = 1; i < excelData.Count; i++)
+    //             {
+    //                 var row = excelData[i];
+
+    //                 var stockSales = new InvStockSalesTemp
+    //                     {
+    //                         Invoice = row[0], 
+
+    //                         Date = DateTime.TryParse(row[1], out var date) && date >= new DateTime(1753, 1, 1) ? date : new DateTime(1753, 1, 1),
+
+    //                         BINNo = row[2], 
+
+    //                         CustomerID = long.TryParse(row[3], out var customerId) ? customerId : (long?)null, 
+
+    //                         LadgerCode = row[4], 
+
+    //                         StoreId = int.TryParse(row[5], out var storeId) ? storeId : (int?)null, 
+
+    //                         ItemId = long.TryParse(row[6], out var itemId) ? itemId : 0, 
+
+    //                         Qty = double.TryParse(row[7], out var qty) ? qty : 0, 
+
+    //                         Price = decimal.TryParse(row[8], out var price) ? price : 0, 
+
+    //                         Total = decimal.TryParse(row[9], out var total) ? total : 0, 
+
+    //                         ItemDiscountAmt = decimal.TryParse(row[10], out var itemDiscountAmt) ? itemDiscountAmt : 0, 
+
+    //                         SDPercentage = decimal.TryParse(row[11], out var sdPercentage) ? sdPercentage : 0, 
+
+    //                         SDAmount = decimal.TryParse(row[12], out var sdAmount) ? sdAmount : 0, 
+
+    //                         ItemVatPer = decimal.TryParse(row[13], out var itemVatPer) ? itemVatPer : 0, 
+
+    //                         FixedVATRate = decimal.TryParse(row[14], out var fixedVatRate) ? fixedVatRate : 0, 
+
+    //                         ItemVat = decimal.TryParse(row[15], out var itemVat) ? itemVat : 0, 
+
+    //                         NetTotal = decimal.TryParse(row[16], out var netTotal) ? netTotal : 0, 
+
+    //                         InvoiceAmount = decimal.TryParse(row[17], out var invoiceAmount) ? invoiceAmount : 0, 
+
+    //                         SalesType = row[18], 
+
+    //                         NatureOfSupply = row[19], 
+
+    //                         DeliveryPoint_Id = long.TryParse(row[20], out var deliveryPointId) ? deliveryPointId : (long?)null, // Excel column 21 -> DeliveryPoint_Id
+                            
+    //                         Remarks = row[21], // Excel column 22 -> Remarks
+                            
+    //                         OCODE = row[22], // Excel column 23 -> OCODE
+                            
+    //                         Create_User = Guid.TryParse(row[23], out var createUser) ? createUser : (Guid?)null, // Excel column 24 -> Create_User
+    //                         Create_Date = DateTime.TryParse(row[24], out var createDate) ? createDate : (DateTime?)null, // Excel column 25 -> Create_Date
+    //                         Edit_User = Guid.TryParse(row[25], out var editUser) ? editUser : (Guid?)null, // Excel column 26 -> Edit_User
+    //                         Edit_Date = DateTime.TryParse(row[26], out var editDate) ? editDate : (DateTime?)null, // Excel column 27 -> Edit_Date
+    //                         VehicleType_Id = int.TryParse(row[27], out var vehicleTypeId) ? vehicleTypeId : (int?)null, // Excel column 28 -> VehicleType_Id
+    //                         VehicleNo = row[28], // Excel column 29 -> VehicleNo
+    //                         DiscountPercent = double.TryParse(row[29], out var discountPercent) ? discountPercent : 0, // Excel column 30 -> DiscountPercent
+    //                         ItemRateDiscPercent = double.TryParse(row[30], out var itemRateDiscPercent) ? itemRateDiscPercent : 0, // Excel column 31 -> ItemRateDiscPercent
+    //                         PO_RefNo = row[31] // Excel column 32 -> PO_RefNo
+    //                     };
+
+    //                 // Add the data to the database using the service.
+    //                 await StockSalesTempService.AddAsync(stockSales);
+    //             }
+
+    //             await JS.InvokeVoidAsync("alert", "File and data saved successfully.");
+    //         }
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         await JS.InvokeVoidAsync("alert", $"Error saving data: {ex.Message}");
+    //     }
+    // }
+
+    
+}

@@ -1,0 +1,95 @@
+﻿@page "/Dashboard"
+
+@using Microsoft.AspNetCore.Components
+@inject NavigationManager NavigationManager
+
+<PageTitle>Home</PageTitle>
+
+<div class="container mt-4">
+    <h1 class="text-center text-primary">Welcome to Stock Management System</h1>
+    <p class="text-center text-muted">Manage your stock efficiently and effortlessly.</p>
+
+    <div class="row mt-5">
+        <!-- Card 1: Add Stock -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Add New Stock Recive</h5>
+                    <p class="card-text">Upload and manage your stock data in one place.</p>
+                    <button class="btn btn-primary" @onclick="NavigateToAddStock">Go to Add Stock</button>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Card 3: Add Stock -->
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Add New Stock Sales</h5>
+                    <p class="card-text">Upload and manage your stock data in one place.</p>
+                    <button class="btn btn-primary" @onclick="NavigateToAddStockSales">Go to Add Stock</button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Card 2: View Stock -->
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">View Stock Recive</h5>
+                    <p class="card-text">See all the stock records at a glance.</p>
+                    <button class="btn btn-success" @onclick="NavigateToViewStock">Go to View Stock</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: View Stock -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">View Stock Salse</h5>
+                    <p class="card-text">See all the stock records at a glance.</p>
+                    <button class="btn btn-success" @onclick="NavigateToViewStockSales">Go to View Stock</button>
+                </div>
+            </div>
+        </div>
+
+       
+    </div>
+</div>
+
+
+
+@code {
+    private void NavigateToAddStock()
+    {
+        NavigationManager.NavigateTo("/inv-stock-receive-upload");
+    }
+
+    private void NavigateToViewStock()
+    {
+        NavigationManager.NavigateTo("/inv-stock-receive-list");
+    }
+
+
+    private void NavigateToAddStockSales()
+    {
+        NavigationManager.NavigateTo("/inv-stock-sales-upload");
+    }
+
+    private void NavigateToViewStockSales()
+    {
+        NavigationManager.NavigateTo("/inv-stock-sales-list");
+    }
+
+    private void NavigateToReports()
+    {
+        NavigationManager.NavigateTo("/reports");
+    }
+
+  
+}
+

@@ -1,0 +1,147 @@
+﻿@using BulkUpload.DataModel.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
+
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager Navigation
+
+<RadzenDialog />
+<RadzenNotification />
+<RadzenContextMenu />
+<RadzenTooltip />
+<AuthorizeView>
+    <Authorized>
+        
+        <RadzenLayout Style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body'">
+            <RadzenHeader Style="background-color: #28282B; color: white;">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" 
+                    Gap="0" JustifyContent="JustifyContent.SpaceBetween">
+
+                    <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+                   
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="20px">
+                        <RadzenLabel Text="@displayText" />
+                        <RadzenButton Text="Logout" Icon="power_settings_new" ButtonStyle="ButtonStyle.Light" Click="Logout" />
+                    </RadzenStack>
+
+                    @* <RadzenProfileMenu>
+                        <Template>
+                            <RadzenIcon Icon="account_circle"></RadzenIcon>
+                        </Template>
+                        <ChildContent>
+                            <RadzenProfileMenuItem Text="Manage account" Icon="manage_accounts" />
+                            <RadzenProfileMenuItem Text="Logout" Icon="power_settings_new" Click="Logout" />
+                                <RadzenButton Text="Logout" class="logout-form-btn" ButtonType="ButtonType.Submit" Icon="power_settings_new" Click="Logout" />
+                            
+                        </ChildContent>
+                    </RadzenProfileMenu> *@
+
+                </RadzenStack>
+            </RadzenHeader>
+            <RadzenSidebar @bind-Expanded="@sidebarExpanded">
+                <RadzenPanelMenu>
+
+                    <RadzenPanelMenuItem Text="ISPAHANI TEA LIMITED" Style="text-align:center; padding:0px; text-decoration:double" />
+
+                    <RadzenPanelMenuItem Text="Home" Path="/Dashboard" Icon="home" />
+                    <RadzenPanelMenuItem Text="Stock Recive" Path="inv-stock-receive-list" Icon="account_box" />
+                    <RadzenPanelMenuItem Text="Stock Sales" Path="inv-stock-sales-list" Icon="account_box" />
+
+                    @* <NavMenu /> *@
+                </RadzenPanelMenu>
+
+            </RadzenSidebar>
+
+            <RadzenBody>
+                <div class="rz-p-4">
+                    @Body
+                </div>
+            </RadzenBody>
+
+        </RadzenLayout>
+
+    </Authorized>
+</AuthorizeView>
+
+
+
+@code {
+    bool sidebarExpanded = true;
+    private string? userName = null;
+    private string displayText = "Loading...";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadUserName();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading username: {ex.Message}");
+        }
+    }
+
+
+    private async Task LoadUserName()
+    {
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity != null && user.Identity.IsAuthenticated)
+        {
+            userName = user.Identity.Name ?? "User";
+        }
+        else
+        {
+            userName = "Guest";
+        }
+        // Update the display text
+        displayText = $"Welcome, {userName}";
+    }
+
+
+
+    private async Task Logout()
+    {
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(null);
+        Navigation.NavigateTo("/", true);
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+@* <div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div> *@
+
+
+@* <div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div> *@

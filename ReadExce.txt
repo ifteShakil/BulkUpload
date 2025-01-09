@@ -1,0 +1,91 @@
+@page "/"
+@rendermode InteractiveServer
+
+
+@using OfficeOpenXml
+@inject IJSRuntime JS
+
+<PageTitle>Home</PageTitle>
+
+<h1>Read Excel File</h1>
+
+<InputFile OnChange="ReadExcelFile" accept=".xlsx" />
+
+@if (excelData != null)
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                @foreach (var header in excelData[0])
+                {
+                    <th>@header</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in excelData.Skip(1))
+            {
+                <tr>
+                    @foreach (var cell in row)
+                    {
+                        <td>@cell</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+
+
+
+
+@code {
+
+    private List<List<string>>? excelData;
+
+    private async Task ReadExcelFile(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var file = e.File;
+            if (file != null)
+            {
+                using var memoryStream = new MemoryStream();
+                await file.OpenReadStream().CopyToAsync(memoryStream);
+                memoryStream.Position = 0;
+
+              
+
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                using var package = new ExcelPackage(memoryStream);
+
+                var worksheet = package.Workbook.Worksheets[0];
+                var rowCount = worksheet.Dimension.Rows;
+                var colCount = worksheet.Dimension.Columns;
+
+                excelData = new List<List<string>>();
+                for (int row = 1; row <= rowCount; row++)
+                {
+                    var rowData = new List<string>();
+                    for (int col = 1; col <= colCount; col++)
+                    {
+                        rowData.Add(worksheet.Cells[row, col].Text);
+                    }
+                    excelData.Add(rowData);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+
+    
+}
+
+
+
