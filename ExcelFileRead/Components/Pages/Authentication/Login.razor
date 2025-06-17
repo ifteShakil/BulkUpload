@@ -13,6 +13,16 @@
 
 @inject NotificationService NotificationService
 
+@inject UserSession userSession
+
+<style>
+    .radzen-login .rz-button {
+        background-color: #054e05 !important;
+        color: white !important;
+</style>
+
+
+
 <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #e8eeff;">
 
     <RadzenCard class="rz-my-12 rz-mx-auto rz-p-4 rz-p-md-12" style="max-width: 600px;">
@@ -22,18 +32,16 @@
                          @bind-Password="model.Password"
                          Login=@(args => OnLogin()) />
         </RadzenTemplateForm> *@
-
+        <img src="/Ispahani-logo-sm.png" alt="ISPAHANI TEA LIMITED" style="justify-self:center; width: 100%; height: 40px; margin-bottom: 10px;" />
         <RadzenTemplateForm Data=@("LoginWithDefaultValues")>
-            <RadzenLogin AllowRegister="false" AllowResetPassword="false" Username=@userName Password=@password
-                         AllowRememberMe="true" RememberMe="@rememberMe"
-                         Login=@(args => OnLogin(args, "Login with default values")) />
+            <RadzenLogin class="radzen-login" AllowRegister="false" AllowResetPassword="false" Username=@userName Password=@password
+                         AllowRememberMe="false" RememberMe="@rememberMe"
+                         Login=@(args => OnLogin(args, "Login with default values")) style="color: darkgray; " />
         </RadzenTemplateForm>
 
     </RadzenCard>
 
 </div>
-
-
 
 
 @code {
@@ -66,12 +74,28 @@
                 var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
                 await customAuthStateProvider.UpdateAuthenticationState(new UserSession
                     {
+                        UserId = userAccount.UserId,
                         LoginName = userAccount.LoginName,
-                        RoleName = userAccount.RoleName
+                        RoleName = userAccount.RoleName,
+                        OCode = userAccount.OCode,
+                        FullName = userAccount.FullName,
+                        EmployeeId = userAccount.EmployeeId,                 
+                        Email = userAccount.Email
+
                     });
 
+                // Set User Session
+                userSession.UserId = userAccount.UserId;
+                userSession.LoginName = userAccount.LoginName;
+                userSession.RoleName = userAccount.RoleName;
+                userSession.OCode = userAccount.OCode;
+                userSession.FullName = userAccount.FullName;
+                userSession.EmployeeId = userAccount.EmployeeId;
+                userSession.Email = userAccount.Email;
+                
+
                 // Navigate to Dashboard
-                Navigation.NavigateTo("/Dashboard", true);
+                Navigation.NavigateTo("/Dashboard", forceLoad: true);
 
             }
 
@@ -96,7 +120,7 @@
 
 
     }
-    
+
 
 
 }

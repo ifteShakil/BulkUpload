@@ -21,14 +21,13 @@
                               LoginName = a.LoginName,
                               Password = b.Password,
                               RoleName = c.RoleName,
-                              //Email = a.Use_Email,
+                              OCode = a.OCode,
+                              FullName = a.UserFullName,
+                              EmployeeId = a.EID,
+                              Email = a.Use_Email
 
                           }).FirstOrDefault();
 
-            if (result == null) 
-            {
-                return null;
-            }
 
             return result;
         }

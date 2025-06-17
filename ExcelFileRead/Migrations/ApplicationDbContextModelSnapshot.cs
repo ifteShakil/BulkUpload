@@ -22,6 +22,365 @@ namespace BulkUpload.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("BulkUpload.DataModel.Authentication.User", b =>
+                {
+                    b.Property<Guid>("UserID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BranchID")
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<string>("Company_Code")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("DemoExpireDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Designation")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("EID")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("EditDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("EditUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Edit_Ip")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LoginName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Mobile_No")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("NID")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("OCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ParentCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("RoleID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Use_Email")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UserFullName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("User_Level")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("UserID");
+
+                    b.ToTable("tbl_User", (string)null);
+                });
+
+            modelBuilder.Entity("BulkUpload.DataModel.Authentication.UserPassword", b =>
+                {
+                    b.Property<Guid>("UserID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("EditDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("EditUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("UserID");
+
+                    b.ToTable("tbl_UserPassword", (string)null);
+                });
+
+            modelBuilder.Entity("BulkUpload.DataModel.Authentication.UserRole", b =>
+                {
+                    b.Property<int>("RoleID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleID"));
+
+                    b.Property<DateTime>("EditDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("EditUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("RoleID");
+
+                    b.ToTable("tbl_UserRole", (string)null);
+                });
+
+            modelBuilder.Entity("BulkUpload.DataModel.Inventory.InvProduct", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"));
+
+                    b.Property<decimal?>("ActualPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Brand")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ConvUnitId")
+                        .HasColumnType("int");
+
+                    b.Property<float?>("ConvUnitQty")
+                        .HasColumnType("real");
+
+                    b.Property<DateTime?>("Create_Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("Create_User")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("DiscountPer")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("Edit_Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("Edit_User")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("HSCODE")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ParentProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ProductCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProductMasterType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProductType")
+                        .HasColumnType("int");
+
+                    b.Property<float?>("ReOrderQty")
+                        .HasColumnType("real");
+
+                    b.Property<decimal?>("RebateAmt")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("RebatePer")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("StoreUnitID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StyleAndSize")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SubId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("SupplementaryVATPer")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("SupplementaryVATPerAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("UnitId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("VATAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("VATPer")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("ProductId");
+
+                    b.ToTable("Inv_Product", (string)null);
+                });
+
+            modelBuilder.Entity("BulkUpload.DataModel.Inventory.InvProductGroup", b =>
+                {
+                    b.Property<int>("GroupId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GroupId"));
+
+                    b.Property<string>("ACDepreciationMethod")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float?>("ACDepreciationRate")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EditDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("EditUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("GroupCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("GroupMasterType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("GroupName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GroupType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Tangibility")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TaxDepreciationMethod")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float?>("TaxDepreciationRate")
+                        .HasColumnType("real");
+
+                    b.HasKey("GroupId");
+
+                    b.ToTable("Inv_ProductGroup", (string)null);
+                });
+
+            modelBuilder.Entity("BulkUpload.DataModel.Inventory.InvStockPoType", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreateUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("EditDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("EditUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("POType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("Status")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Inv_StockPoType", (string)null);
+                });
+
+            modelBuilder.Entity("BulkUpload.DataModel.Inventory.InvStockPort", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreateUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("EditDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("EditUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PortName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("Status")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Inv_StockPort", (string)null);
+                });
+
             modelBuilder.Entity("BulkUpload.DataModel.Inventory.InvStockReceiveTemp", b =>
                 {
                     b.Property<long>("Id")
@@ -212,7 +571,372 @@ namespace BulkUpload.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Inv_StockReceive_Temp");
+                    b.ToTable("Inv_StockReceive_Temp", (string)null);
+                });
+
+            modelBuilder.Entity("BulkUpload.DataModel.Inventory.InvStockSalesTemp", b =>
+                {
+                    b.Property<long>("SalesTempId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("SalesTempId"));
+
+                    b.Property<string>("BINNo")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("Create_Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("Create_User")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long?>("CustomerID")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeliveryPoint_Id")
+                        .HasColumnType("bigint");
+
+                    b.Property<double>("DiscountPercent")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("Edit_Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("Edit_User")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("FixedVATRate")
+                        .HasColumnType("numeric(18, 2)");
+
+                    b.Property<string>("Invoice")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("InvoiceAmount")
+                        .HasColumnType("numeric(22, 9)");
+
+                    b.Property<decimal>("ItemDiscountAmt")
+                        .HasColumnType("numeric(22, 9)");
+
+                    b.Property<long>("ItemId")
+                        .HasColumnType("bigint");
+
+                    b.Property<double>("ItemRateDiscPercent")
+                        .HasColumnType("float");
+
+                    b.Property<decimal>("ItemVat")
+                        .HasColumnType("numeric(22, 9)");
+
+                    b.Property<decimal>("ItemVatPer")
+                        .HasColumnType("numeric(18, 2)");
+
+                    b.Property<string>("LadgerCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("NatureOfSupply")
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
+
+                    b.Property<decimal>("NetTotal")
+                        .HasColumnType("numeric(22, 9)");
+
+                    b.Property<string>("OCODE")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("PO_RefNo")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric(22, 4)");
+
+                    b.Property<double>("Qty")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<decimal>("SDAmount")
+                        .HasColumnType("numeric(22, 9)");
+
+                    b.Property<decimal>("SDPercentage")
+                        .HasColumnType("numeric(18, 2)");
+
+                    b.Property<string>("SalesType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("StoreId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("numeric(22, 4)");
+
+                    b.Property<string>("VehicleNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("VehicleType_Id")
+                        .HasColumnType("int");
+
+                    b.HasKey("SalesTempId");
+
+                    b.ToTable("Inv_StockSalesTemp", (string)null);
+                });
+
+            modelBuilder.Entity("BulkUpload.DataModel.Inventory.InvStockVATHSCode", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal?>("AIT")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("AT")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("ATV")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("CD")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("Create_Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("Create_User")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("EXD")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("Edit_Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("Edit_User")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("HSCODE")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("RD")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("SD")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool?>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("TTI")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("VAT")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Inv_StockVAT_HSCODE", (string)null);
+                });
+
+            modelBuilder.Entity("BulkUpload.DataModel.Inventory.InvStore", b =>
+                {
+                    b.Property<int>("StoreId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StoreId"));
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("AreaId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreateUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("EditDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EditUser")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("StoreCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StoreName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("StoreTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("StoreId");
+
+                    b.ToTable("Inv_Store", (string)null);
+                });
+
+            modelBuilder.Entity("BulkUpload.DataModel.Inventory.InvSupplier", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BINNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BankName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BusinessCapital")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BusinessType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CertificateIncorp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPerson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPersonDesignation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPersonEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPersonFax")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPersonMobile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPersonPhone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreditDays")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DistrictId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("EditDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("EditUser")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("EmailAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("Enlisted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("EntryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Fired")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("IncorpDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ItemCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LedgerCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("OpeningBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("OpeningNature")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Performance")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SupplierCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SupplierFax")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SupplierMobile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SupplierName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SupplierRemarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SupplierType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TinNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TradeLicenseNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VATRegistrationNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VATStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Validity")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Inv_Supplier", (string)null);
                 });
 #pragma warning restore 612, 618
         }

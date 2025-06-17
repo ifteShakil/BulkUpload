@@ -1,0 +1,65 @@
+﻿@page "/inv-product-list"
+@using BulkUpload.DataModel.Inventory
+@using BulkUpload.Repository.Interface
+@using Microsoft.EntityFrameworkCore
+
+@inject BulkUpload.Repository.Interface.IProduct ProductService
+
+<h3>Port </h3>
+
+<div class="container mt-3">
+    <div class="row mb-3">
+
+        @*         <div class="col-md-12 text-end">
+
+            <a class="btn btn-success" href="inv-stock-sales-upload">Upload Stock Sales Data</a>
+        </div> *@
+
+    </div>
+    @if (Data == null)
+    {
+        <div class="alert alert-info">Loading data...</div>
+    }
+    else if (!Data.Any())
+    {
+        <div class="alert alert-warning">No data found.</div>
+    }
+    else
+    {
+
+        <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false"
+                        FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="8" AllowPaging="true"
+                        PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                        Data="@Data" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or"
+                        SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedPortData>
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(InvProduct.ProductCode)" Filterable="false" Title="Code" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Property="@nameof(InvProduct.ProductName)" Title="Port Name" Width="160px" />
+
+            </Columns>
+        </RadzenDataGrid>
+
+
+    }
+
+</div>
+
+
+
+
+@code {
+
+
+    IQueryable<InvProduct> Data;
+    IList<InvProduct> selectedPortData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Data = ProductService.GetAll();
+
+        selectedPortData = new List<InvProduct>() {
+            Data.FirstOrDefault()
+        };
+    }
+}

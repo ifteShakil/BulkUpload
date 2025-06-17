@@ -3,6 +3,7 @@ using BulkUpload.DataModel.Inventory;
 using BulkUpload.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace BulkUpload.Repository.Services
 {
     public class StockSalesTempService : IStockSalesTempService
@@ -33,6 +34,12 @@ namespace BulkUpload.Repository.Services
             await _context.SaveChangesAsync();
         }
 
-       
+        public async Task AddRangeAsync(List<InvStockSalesTemp> list)
+        {
+            await _context.Inv_StockSalesTemp.AddRangeAsync(list);
+            await _context.SaveChangesAsync();
+
+
+        }
     }
 }

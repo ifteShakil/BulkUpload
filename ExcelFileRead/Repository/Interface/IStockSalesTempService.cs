@@ -1,5 +1,6 @@
 ﻿using BulkUpload.DataModel.Inventory;
 
+
 namespace BulkUpload.Repository.Interface
 {
     public interface IStockSalesTempService
@@ -8,5 +9,8 @@ namespace BulkUpload.Repository.Interface
 
         Task<List<InvStockSalesTemp>> GetAllAsync();
         Task AddAsync(InvStockSalesTemp stockSales);
+
+        Task AddRangeAsync(List<InvStockSalesTemp> list);
+
     }
 }

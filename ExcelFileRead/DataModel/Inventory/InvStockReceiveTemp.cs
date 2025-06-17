@@ -1,16 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BulkUpload.DataModel.Inventory
 {
     [Table("Inv_StockReceive_Temp")]
     public class InvStockReceiveTemp
     {
+        [Key]
         public long Id { get; set; }
         public string? ChallanNo { get; set; }
         public string? BOMNo { get; set; }
         public DateTime? ChallanDate { get; set; }
         public string? ChallanRef { get; set; }
+        
         public int? PortId { get; set; }
+     
+        //public InvStockPort? Port { get; set; }
+
+
         public string? PoType { get; set; }
         public string? PoRefNo { get; set; }
         public string? JobNo { get; set; }

@@ -4,7 +4,7 @@ using System.Security.Claims;
 
 namespace BulkUpload.DataModel.Authentication
 {
-    public class CustomAuthenticationStateProvider : AuthenticationStateProvider
+    internal class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
         private readonly ProtectedLocalStorage _sessionStorage;
 
@@ -56,14 +56,24 @@ namespace BulkUpload.DataModel.Authentication
             if (userSession != null)
             {
                 await _sessionStorage.SetAsync("UserSession", userSession);
-                claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, userSession.LoginName),
-                    new Claim(ClaimTypes.Role, userSession.RoleName),
-                    new Claim(ClaimTypes.NameIdentifier, userSession.UserId.ToString()),
-                    new Claim("tenantId", userSession.UserId.ToString())
 
-                }, "CustomAuth"));
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, userSession.LoginName ?? ""),
+                    new Claim(ClaimTypes.Role, userSession.RoleName ?? ""),
+                    new Claim(ClaimTypes.NameIdentifier, userSession.UserId.ToString()),
+                    new Claim("OCode", userSession.OCode),
+                    new Claim("FullName", userSession.FullName ?? ""),
+                    new Claim("Email", userSession.Email ?? ""),
+                    new Claim("EmployeeId", userSession.EmployeeId ?? ""),
+
+
+
+                };
+
+                claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, "CustomAuth"));
+
+
             }
             else
             {
@@ -73,5 +83,7 @@ namespace BulkUpload.DataModel.Authentication
 
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
         }
+    
+    
     }
 }

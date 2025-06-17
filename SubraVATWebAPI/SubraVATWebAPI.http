@@ -1,0 +1,54 @@
+@SubraVATWebAPI_HostAddress = http://localhost:5151
+
+### Login
+POST {{SubraVATWebAPI_HostAddress}}/api/Auth/login
+Content-Type: application/json
+{
+  "UserName": "subra",
+  "Password": "ssl@1234"
+}
+
+### Create Bulk Sales
+POST {{SubraVATWebAPI_HostAddress}}/api/SalesTemp/bulksalestemp
+Content-Type: application/json
+
+[
+  {
+    "InvoiceRef": "1238",
+    "Date": "2023-10-01T00:00:00Z",
+    "CustomerCode": "22.01.01.428",
+    "StoreCode": "06",
+    "ProductCode": "320249",
+    "Qty": 10,
+    "Price": 20.0,
+    "Total": 200.0,
+    "ItemVatPer": 15.0,
+    "ItemVat": 30.0,
+    "NetTotal": 230.0,
+    "SalesType": "Local",
+    "NatureOfSupply": "Standard Rated Goods/Service",
+    "Remarks": "check",
+    "VehicleNo": "ABV234"
+  },
+  {
+    "InvoiceRef": "1239",
+    "Date": "2023-10-01T00:00:00Z",
+    "CustomerCode": "22.01.01.428",
+    "StoreCode": "06",
+    "ProductCode": "321053",
+    "Qty": 10,
+    "Price": 20.0,
+    "Total": 200.0,
+    "ItemVatPer": 15.0,
+    "ItemVat": 30.0,
+    "NetTotal": 230.0,
+    "SalesType": "Local",
+    "NatureOfSupply": "Standard Rated Goods/Service",
+    "Remarks": "check",
+    "VehicleNo": "ABV234"
+  }
+]
+
+
+
+###

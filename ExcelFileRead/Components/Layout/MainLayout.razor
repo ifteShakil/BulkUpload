@@ -39,13 +39,17 @@
                 </RadzenStack>
             </RadzenHeader>
             <RadzenSidebar @bind-Expanded="@sidebarExpanded">
+                <img src="/Ispahani-logo-sm.png" alt="ISPAHANI TEA LIMITED" style="justify-self:center; width: 95%; height: 45px; margin: 4px; padding: 2px;" />
                 <RadzenPanelMenu>
 
-                    <RadzenPanelMenuItem Text="ISPAHANI TEA LIMITED" Style="text-align:center; padding:0px; text-decoration:double" />
+                    @* <RadzenPanelMenuItem Text="ISPAHANI TEA LIMITED" Style="text-align:center; padding:0px; text-decoration:double" /> *@
+                    @* <RadzenPanelMenuItem Text="ISPAHANI TEA LIMITED" Image="/Ispahani-logo-sm.png" Style="width:fit-content;" /> *@
 
                     <RadzenPanelMenuItem Text="Home" Path="/Dashboard" Icon="home" />
-                    <RadzenPanelMenuItem Text="Stock Recive" Path="inv-stock-receive-list" Icon="account_box" />
-                    <RadzenPanelMenuItem Text="Stock Sales" Path="inv-stock-sales-list" Icon="account_box" />
+                    <RadzenPanelMenuItem Text="Purchase Data Upload" Path="inv-stock-receive-list" Icon="account_box" />
+                    <RadzenPanelMenuItem Text="Sales Data Upload" Path="inv-stock-sales-list" Icon="account_box" />
+                    <RadzenPanelMenuItem Text="Purchase Saved file" Path="recive-saved-file" Icon="account_box" />
+                    <RadzenPanelMenuItem Text="Sales Saved file" Path="sales-saved-file" Icon="account_box" />
 
                     @* <NavMenu /> *@
                 </RadzenPanelMenu>

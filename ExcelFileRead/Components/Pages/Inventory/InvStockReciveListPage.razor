@@ -5,17 +5,17 @@
 @using OfficeOpenXml
 
 @inject IJSRuntime JS
-@inject IStockReceiveService StockReceiveService
-
+@inject IStockReceiveTempService StockReceiveService
+@inject NavigationManager NavigationManager
 <PageTitle>Stock Receive List</PageTitle>
 
 <h3>Stock Receive </h3>
 
 
 <div class="container mt-3">
-    <div class="row mb-3">
+    <div class="row mb-3">  
         <div class="col-md-12 text-end">
-            <a class="btn btn-success" href="inv-stock-receive-upload">Upload Stock Receive Data</a>
+            <a class="btn btn-success" @onclick="NavigateToUploadPage">Upload Stock Receive Data</a>
         </div>
     </div>
 
@@ -75,7 +75,10 @@
         };
     }
 
-    
+    private void NavigateToUploadPage()
+    {
+        NavigationManager.NavigateTo("inv-stock-receive-upload");
+    }
 
 
 }

@@ -1,0 +1,162 @@
+﻿@page "/sales-saved-file"
+
+
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<h3>Sales Files</h3>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>SL No</th>
+            <th>File Name</th>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (fileList != null && fileList.Any())
+        {
+            int sl = 1;
+            @foreach (var file in fileList)
+            {
+                <tr>
+                    <td>@sl</td>
+                    <td>@file.FileName</td>
+                    <td>@file.UploadDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td>
+                        <button @onclick="() => DownloadFile(file.FileName, file.FilePath)">Download</button>
+
+                      
+                    </td>
+                </tr>
+
+                sl++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" class="text-center">No files found</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+   
+    private List<FileData> fileList = new();
+
+    protected override void OnInitialized()
+    {
+        LoadFileList();
+        
+    }
+
+    private void LoadFileList()
+    {
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "StockSalesFiles");
+
+        if (Directory.Exists(uploadsFolder))
+        {
+            var files = Directory.GetFiles(uploadsFolder)
+                .Select(filePath => new FileData
+                    {
+                        FileName = Path.GetFileName(filePath),
+                        UploadDate = File.GetCreationTime(filePath),
+                        FilePath = $"/StockSalesFiles/{Path.GetFileName(filePath)}"
+                    })
+                .OrderByDescending(f => f.UploadDate)
+                .ToList();
+
+            fileList = files;
+
+            
+        }
+    }
+
+    public class FileData
+    {
+        public string FileName { get; set; } = string.Empty;
+        public DateTime UploadDate { get; set; }
+        public string FilePath { get; set; } = string.Empty;
+    }
+
+
+
+
+    private async Task DownloadFile(string fileName, string relativeFilePath)
+    {
+        var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativeFilePath.TrimStart('/'));
+
+        if (!System.IO.File.Exists(fullPath))
+        {
+            await JS.InvokeVoidAsync("alert", $"File not found: {fullPath}");
+            return;
+        }
+
+        var fileStream = System.IO.File.OpenRead(fullPath);
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    }
+
+
+}
+
+
+<script>
+    window.downloadFileFromStream = async (fileName, contentStreamReference) => {
+        const arrayBuffer = await contentStreamReference.arrayBuffer();
+        const blob = new Blob([arrayBuffer]);
+        const url = URL.createObjectURL(blob);
+        const anchorElement = document.createElement('a');
+        anchorElement.href = url;
+        anchorElement.download = fileName ?? '';
+        anchorElement.click();
+        anchorElement.remove();
+        URL.revokeObjectURL(url);
+    };
+</script>
+
+
+
+@* 
+    // private Stream GetFileStream()
+    // {
+    //     var randomBinaryData = new byte[50 * 1024];
+    //     var fileStream = new MemoryStream(randomBinaryData);
+
+    //     return fileStream;
+    // }
+
+
+
+    // private async Task DownloadFileFromStream()
+    // {
+    //     var fileStream = GetFileStream();
+    //     var fileName = "log.bin";
+
+    //     using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+    //     await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    // } *@
+
+
+
+@* 
+
+<script>
+    window.downloadFileFromStream = async (fileName, contentStreamReference) => {
+      const arrayBuffer = await contentStreamReference.arrayBuffer();
+      const blob = new Blob([arrayBuffer]);
+      const url = URL.createObjectURL(blob);
+      const anchorElement = document.createElement('a');
+      anchorElement.href = url;
+      anchorElement.download = fileName ?? '';
+      anchorElement.click();
+      anchorElement.remove();
+      URL.revokeObjectURL(url);
+    }
+</script> *@
